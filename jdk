@@ -1,0 +1,41 @@
+#!/data/data/com.termux/files/usr/bin/bash
+cd $(dirname $0)
+## unset LD_PRELOAD in case termux-exec is installed
+unset LD_PRELOAD
+alias nothm='PROMPT_COMMAND=""'
+PROMPT_DIRTRIM=2
+shift $(($OPTIND-1))
+command="proot"
+command+=" --link2symlink"
+command+=" -0"
+command+=" -r /data/data/com.termux/files/home/termux-java/java"
+command+=" -b /dev"
+command+=" -b /proc"
+command+=" -b /storage"
+command+=" -b /sdcard"
+command+=" -b /system"
+command+=" -b /sys"
+command+=" -b /data"
+## uncomment the following line to have access to the home directory of termux
+command+=" -b /data/data/com.termux/files/usr:/usr"
+command+=" -b /data/data/com.termux/files/home:/home"
+command+=" -w /home"
+command+=" /usr/bin/env -i"
+command+=" HOME=/home"
+command+=" ANDROID_ROOT=/system"
+command+=" ANDROID_DATA=/data"
+command+=" EXTERNAL_STORAGE=/storage/self/primary"
+command+=" LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/lib"
+command+=" PATH=/usr/local/sbin:/usr/local/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/games:/usr/local/games"
+command+=" TERM=$TERM"
+command+=" LANG=C.UTF-8"
+com="$@"
+command+=" /bin/bash --login"
+if [ -x $HOME/.logname/shell ]; then
+	command=`readlink -f $HOME/.logname/shell`
+fi
+if [ -z "$1" ];then
+    exec $command
+else
+    $command -c "$com"
+fi
